@@ -1,6 +1,35 @@
 <?php
-session_start();
- ?>
+if(!isset($_SESSION['user'])){
+    redirect_to('page_login.php');
+    exit();
+}
+if (!is_admin()){
+    if(!is_author($_SESSION['user']['id'], $_GET['id'])) {
+        set_flash_message('danger', '<strong>Уведомление!</strong> Редактировать можно только свой профиль.');
+        redirect_to('users.php');
+        exit();
+    }
+};
+
+$user = get_user_by_id($_GET['id']);
+
+$statuses = [
+    [
+        'value' => '1',
+        'title' => 'Онлайн',
+    ],
+    [
+        'value' => '2',
+        'title' => 'Отошел',
+    ],
+    [
+        'value' => '3',
+        'title' => 'Не беспокоить',
+    ],
+];
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +70,8 @@ session_start();
             </h1>
 
         </div>
-        <form action="function" method="post">
+        <?=display_flash_message('success')?>
+        <form action="status.edit.php" method="post">
             <div class="row">
                 <div class="col-xl-6">
                     <div id="panel-1" class="panel">
@@ -54,11 +84,13 @@ session_start();
                                     <div class="col-md-4">
                                         <!-- status -->
                                         <div class="form-group">
+                                            <input type="hidden" value="<?=$user['id']?>" name="id">
                                             <label class="form-label" for="example-select">Выберите статус</label>
-                                            <select class="form-control" name="status" id="example-select">
-                                                <option value="online">Онлайн</option>
-                                                <option value="goout">Отошел</option>
-                                                <option value="bother">Не беспокоить</option>
+                                            <select class="form-control" name="status">
+                                                <option value=""></option>
+                                                <?php foreach ($statuses as $status):?>
+                                                    <option value="<?=$status['value']?>" <?=$user['status'] == $status['value'] ? 'selected' : '' ?> ><?=$status['title']?></option>
+                                                <?endforeach;?>
                                             </select>
                                         </div>
                                     </div>

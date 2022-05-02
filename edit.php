@@ -1,6 +1,14 @@
 <?php
 session_start();
-include 'allfunction.php';
+require_once 'allfunction.php';
+
+if (!is_admin()){
+    if(!is_author($_SESSION['user']['id'], $_GET['id'])) {
+        set_flash_message('danger', '<strong>Уведомление!</strong> Редактировать можно только свой профиль.');
+        redirect_to('users.php');
+        exit();
+    }
+};
 
 $user = get_user_by_id($_GET['id']);
 
@@ -54,31 +62,34 @@ $user = get_user_by_id($_GET['id']);
                                 <h2>Общая информация</h2>
                             </div>
                             <div class="panel-content">
+                                <?=display_flash_message('success')?>
+
+                                <input type="hidden" name="id" value="<?=$user['id']?>">
                                 <!-- username -->
                                 <div class="form-group">
-                                    <label class="form-label" for="simpleinput">Имя</label>
-                                    <input type="text" name="fullname"  id="simpleinput" class="form-control" value="Иван иванов">
+                                    <label class="form-label" for="">Имя</label>
+                                    <input type="text" class="form-control" name="fullname" value="<?=$user['fullname']?>">
                                 </div>
 
                                 <!-- title -->
                                 <div class="form-group">
-                                    <label class="form-label" for="simpleinput">Место работы</label>
-                                    <input type="text" name="workplace"    id="simpleinput" class="form-control" value="Marlin Веб-разработчик">
+                                    <label class="form-label" for="">Место работы</label>
+                                    <input type="text" class="form-control" name="workplace" value="<?=$user['workplace']?>">
                                 </div>
 
                                 <!-- tel -->
                                 <div class="form-group">
-                                    <label class="form-label" for="simpleinput">Номер телефона</label>
-                                    <input type="text" name="number"   id="simpleinput" class="form-control" value="8 888 8888 88">
+                                    <label class="form-label" for="">Номер телефона</label>
+                                    <input type="text" class="form-control" name="phone" value="<?=$user['phone']?>">
                                 </div>
 
                                 <!-- address -->
                                 <div class="form-group">
-                                    <label class="form-label" for="simpleinput">Адрес</label>
-                                    <input type="text" id="simpleinput" name="address"  class="form-control" value="Восточные Королевства, Штормград">
+                                    <label class="form-label" for="">Адрес</label>
+                                    <input type="text" class="form-control" name="adress" value="<?=$user['adress']?>">
                                 </div>
                                 <div class="col-md-12 mt-3 d-flex flex-row-reverse">
-                                    <button type="submit" class="btn btn-warning">Редактировать</button>
+                                    <button class="btn btn-warning">Редактировать</button>
                                 </div>
                             </div>
                         </div>

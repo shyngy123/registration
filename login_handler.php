@@ -1,18 +1,12 @@
 <?php
+
 session_start();
-include 'allfunction.php';
+require 'allfunction.php';
 
-$email=$_POST['email'];
-$password=$_POST['password'];
+$email = $_POST['email'];
+$password = $_POST['password'];
 
-
-
-
-enter_login($email, $password);
-
-
-
-
+login($email, $password);
 
 
 

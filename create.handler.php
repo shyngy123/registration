@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'allfunction.php';
+
 $name = $_POST['fullname'];
 $workplace = $_POST['workplace'];
 $phone = $_POST['phone'];
@@ -17,29 +18,42 @@ $tg = $_POST['tg'];
 $insta = $_POST['insta'];
 
 
-check_login_user($email);
-if (!empty($user)) {
-  $_SESSION['message']='Логин занято!';
-   header('Location: page_register.php');
+
+// Проверяем на пустоту поля емейл и пароль
+if(empty($email) && empty($password)) {
+    set_flash_message('danger', '<strong>Уведомление!</strong> Эл. адрес и пароль - должны быть заполнены.');
+    redirect_to('create_user.php');
+    exit();
 }
 
-add_user($email, $password);
-edit_info ($id, $fullname, $workplace, $phone, $adress);
+// Получаем юзера и проверяем есть ли введенный емейл в базе
+$user = get_user_by_email($email);
+if(!empty($user)) {
+    set_flash_message('danger', '<strong>Уведомление!</strong> Этот эл. адрес уже занят другим пользователем.');
+    redirect_to('create_user.php');
+    exit();
+}
 
+// добавляем пользователя и получаем его айди
+$last_user_id = add_user($email, $password);
 
+// записываем в бд информацию
+edit_info ($last_user_id, $name, $workplace, $phone, $adress);
 
+// записываем в бд статус юзера
+set_status($last_user_id, $status);
 
-
-
+// загружаем аватарку в папку и сохраняем название в бд
 if(!empty($image['name'])) {
-     upload_media( $id);
+    upload_avatar($last_user_id, $image);
 }
 
-add_social_links($id, $vk, $tg, $insta)
+// записываем в бд соцсети
+add_social_links($last_user_id, $vk, $tg, $insta);
 
-
-
-
+set_flash_message('success', '<strong>Уведомление!</strong> Пользователь успешно добавлен.');
+redirect_to('users.php');
+exit();
 
 
 

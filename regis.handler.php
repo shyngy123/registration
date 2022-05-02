@@ -1,22 +1,24 @@
 <?php
 session_start();
-include 'allfunction.php';
-$email=$_POST['email'];
-$password=$_POST['password'];
+require 'allfunction.php';
 
+$email = $_POST['email'];
+$password = $_POST['password'];
 
+$user = get_user_by_email($email);
 
-
-check_login_user($email);
-if (!empty($user)) {
-  $_SESSION['message']='Логин занято!';
-   header('Location: page_register.php');
-}else {
-  add_user($email, $password);
-  $_SESSION['message']='Успешная регистрация';
-  header('Location: page_login.php');
+if(!empty($user)) {
+    set_flash_message('danger', '<strong>Уведомление!</strong> Этот эл. адрес уже занят другим пользователем.');
+    redirect_to('page_register.php');
+    exit();
 }
 
+add_user($email, $password);
+
+set_flash_message('success', 'Регистрация успешна');
+
+redirect_to('page_login.php');
+exit();
 
 
 
